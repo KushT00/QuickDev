@@ -9,7 +9,6 @@ import {
 
     IconUserBolt,
 } from "@tabler/icons-react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { MorphingDialog, MorphingDialogTrigger, MorphingDialogImage, MorphingDialogTitle, MorphingDialogSubtitle, MorphingDialogContainer, MorphingDialogContent, MorphingDialogDescription } from "@/components/ui/morphing-dialog";
@@ -17,7 +16,7 @@ import { PlusIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser } from "../../../context/userContext";
-import { Logo, LogoIcon } from "./logo";
+import { Logo, LogoIcon } from "../../../components/ui/logo";
 
 
 export default function SidebarDemo() {
