@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 
 "use client";
 import React, { useState } from "react";
@@ -9,7 +10,6 @@ import {
     IconUserBolt,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { MorphingDialog, MorphingDialogTrigger, MorphingDialogImage, MorphingDialogTitle, MorphingDialogSubtitle, MorphingDialogContainer, MorphingDialogContent, MorphingDialogDescription } from "@/components/ui/morphing-dialog";
@@ -17,6 +17,7 @@ import { PlusIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser } from "../../../context/userContext";
+import { Logo } from "./logo";
 
 
 export default function SidebarDemo() {
@@ -78,23 +79,7 @@ export default function SidebarDemo() {
         </div>
     );
 }
-export const Logo = () => {
-    return (
-        <Link
-            href="/"
-            className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-        >
-            <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-            <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="font-medium text-black dark:text-white whitespace-pre"
-            >
-                Quick Dev
-            </motion.span>
-        </Link>
-    );
-};
+
 export const LogoIcon = () => {
     return (
         <Link
