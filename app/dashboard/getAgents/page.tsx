@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+
 "use client";
 import React, { useState } from "react";
 
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { MorphingDialog, MorphingDialogTrigger, MorphingDialogImage, MorphingDialogTitle, MorphingDialogSubtitle, MorphingDialogContainer, MorphingDialogContent, MorphingDialogDescription, MorphingDialogClose } from "@/components/ui/morphing-dialog";
+import { MorphingDialog, MorphingDialogTrigger, MorphingDialogImage, MorphingDialogTitle, MorphingDialogSubtitle, MorphingDialogContainer, MorphingDialogContent, MorphingDialogDescription } from "@/components/ui/morphing-dialog";
 import { PlusIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
