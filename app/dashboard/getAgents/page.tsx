@@ -17,7 +17,7 @@ import { PlusIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser } from "../../../context/userContext";
-import { Logo } from "./logo";
+import { Logo, LogoIcon } from "./logo";
 
 
 export default function SidebarDemo() {
@@ -80,16 +80,7 @@ export default function SidebarDemo() {
     );
 }
 
-export const LogoIcon = () => {
-    return (
-        <Link
-            href="#"
-            className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-        >
-            <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-        </Link>
-    );
-};
+
 
 function GlowButton({ children, onClick, className }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
     return (
