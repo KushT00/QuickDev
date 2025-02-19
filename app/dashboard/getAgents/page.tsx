@@ -3,16 +3,10 @@
 "use client";
 import React, { useState } from "react";
 
-import {
-
-    IconBrandTabler,
-
-    IconUserBolt,
-} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { MorphingDialog, MorphingDialogTrigger, MorphingDialogImage, MorphingDialogTitle, MorphingDialogSubtitle, MorphingDialogContainer, MorphingDialogContent, MorphingDialogDescription } from "@/components/ui/morphing-dialog";
-import { PlusIcon, Search } from "lucide-react";
+import { Book, Bot, FileQuestion,  MessageCircle, Moon, PlusCircle, PlusIcon, Search, Settings, Sun, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser } from "../../../context/userContext";
@@ -20,45 +14,88 @@ import { Logo, LogoIcon } from "../../../components/ui/logo";
 
 
 export default function SidebarDemo() {
+    const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const { userName } = useUser(); // Destructure userName from the context
-
+    const toggleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        document.documentElement.className = newTheme;
+    };
     const links = [
+
         {
-            label: "Hire a Dev",
+            label: "Hire Developers",
             href: "getDev",
-            icon: (
-                <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <Users className="h-5 w-5 flex-shrink-0" />,
         },
         {
             label: "Hire Agents",
             href: "getAgents",
-            icon: (
-                <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <Bot className="h-5 w-5 flex-shrink-0" />,
         },
+        {
+            label: "Create Agent",
+            href: "createAgent",
+            icon: <PlusCircle className="h-5 w-5 flex-shrink-0" />,
+        },
+        {
+            label: "Request",
+            href: "postRequest",  // New page where users can post their needs
+            icon: <FileQuestion className="h-5 w-5 flex-shrink-0" />,
+        },
+        {
+            label: "Chats",
+            href: "chats",  // New page where users can post their needs
+            icon: <MessageCircle className="h-5 w-5 flex-shrink-0" />,
+        },
+        {
+            label: "Knowledge Base",  
+            href: "knowledgeBase",
+            icon: <Book className="h-5 w-5 flex-shrink-0 " />,
+        },
+        {
+            label: "Settings",
+            href: "settings",
+            icon: <Settings className="h-5 w-5 flex-shrink-0" />,
+        }
     ];
+
     const [open, setOpen] = useState(false);
     return (
         <div
             className={cn(
-                " flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full h-screen max-w-full mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+                "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full h-screen max-w-full mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden"
             )}
         >
             <Sidebar open={open} setOpen={setOpen}>
                 <SidebarBody className="justify-between gap-10">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-                        {open ? <Logo /> : <LogoIcon />}
+                    <div className="flex items-center justify-between ">
+                            {open ? <Logo /> : <LogoIcon />}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={toggleTheme}
+                                className="ml-auto"
+                            >
+                                {theme === 'light' ? (
+                                    <Moon className="h-5 w-5" />
+                                ) : (
+                                    <Sun className="h-5 w-5" />
+                                )}
+                            </Button>
+                        </div>
                         <div className="mt-8 flex flex-col gap-2">
                             {links.map((link, idx) => (
                                 <SidebarLink key={idx} link={link} />
                             ))}
                         </div>
+                        
                     </div>
                     <div>
                         <SidebarLink
                             link={{
-                                label: userName || "Guest",
+                                label: userName || "Guest", // Dynamically set the username
                                 href: "#",
                                 icon: (
                                     <img
@@ -74,11 +111,10 @@ export default function SidebarDemo() {
                     </div>
                 </SidebarBody>
             </Sidebar>
-            <GetAgent />
+            <GetAgent/>
         </div>
     );
 }
-
 
 
 function GlowButton({ children, onClick, className }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
@@ -106,33 +142,33 @@ const GetAgent = () => {
 
             <div className="px-6 pb-10 md:px-10">
                 {/* Search and Filter Section */}
-                <div className="max-w-7xl mt-10 mx-auto mb-10">
-                    <div className="glass-morphism p-6 rounded-2xl">
-                        <div className="flex flex-col md:flex-row gap-4 items-end">
-                            <div className="flex-1 space-y-2">
-                                <label className="text-sm text-primary font-medium">
-                                    Search Agents
-                                </label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                                    <Input
-                                        type="text"
-                                        placeholder="Search by name or capability..."
-                                        className="pl-10 bg-background/50 border-white/10 focus:border-primary"
-                                    />
+                <div className="max-w-7xl mt-10 mx-auto mb-10 shadow rounded-md">
+                                    <div className=" dark:glass-morphism light:glass-light p-6 rounded-2xl">
+                                        <div className="flex flex-col md:flex-row gap-4 items-end">
+                                            <div className="flex-1 space-y-2">
+                                                <label className="text-sm text-primary font-medium">
+                                                    Search Developers
+                                                </label>
+                                                <div className="relative">
+                                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Search by name, role, or skill..."
+                                                        className="pl-10 bg-background/50 border-primary focus:border-primary"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button variant="secondary" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                                    Filter
+                                                </Button>
+                                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                                                    Search
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button variant="secondary" className="neo-blur">
-                                    Filter
-                                </Button>
-                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                                    Search
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
 
                 {/* Agents Grid */}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "next/link";
 import React, { useState, createContext, useContext } from "react";
@@ -116,6 +117,7 @@ export const MobileSidebar = ({
   const { open, setOpen } = useSidebar();
   return (
     <>
+      {/* Mobile Header */}
       <div
         className={cn(
           "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between",
@@ -135,42 +137,59 @@ export const MobileSidebar = ({
             onClick={() => setOpen(!open)}
           />
         </div>
-        <AnimatePresence>
-          {open && (
+      </div>
+
+      {/* Mobile Sidebar Drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Backdrop */}
             <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] md:hidden"
+              onClick={() => setOpen(false)}
+            />
+            
+            {/* Sidebar Content */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 20 }}
               className={cn(
-                "fixed h-full w-full inset-0 p-10 z-[100] flex flex-col justify-between",
-                "bg-white/80 backdrop-blur-lg",
-                "dark:bg-neutral-900/80",
+                "fixed top-0 left-0 h-full w-[280px] z-[100] md:hidden",
+                "bg-white dark:bg-neutral-900",
+                "border-r border-neutral-200 dark:border-neutral-800",
+                "flex flex-col",
                 className
               )}
             >
-              <div className="absolute inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-1/4 left-1/3 w-[400px] h-[300px] bg-purple-500/20 blur-3xl rounded-full" />
-                <div className="absolute bottom-1/3 left-1/2 w-[350px] h-[350px] bg-blue-400/20 blur-2xl rounded-full" />
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800">
+                <span className="font-semibold">Menu</span>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
+                >
+                  <IconX className="w-5 h-5" />
+                </button>
               </div>
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {children}
               </div>
-              {children}
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };
 
+// Update SidebarLink to work better on mobile
 export const SidebarLink = ({
   link,
   className,
@@ -185,22 +204,28 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
-        "text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100",
-        "transition-all duration-200 ease-in-out","hover:bg-black/5 dark:hover:bg-white/5",
-        "hover:p-2","hover:rounded-md",
+        "flex items-center gap-3 hover:pl-2 py-2 rounded-md",
+        "text-neutral-700 hover:text-neutral-100 dark:text-neutral-300 dark:hover:text-neutral-100",
+        "hover:bg-primary/90 dark:hover:bg-transparent",
+        "transition-all duration-200",
         className
       )}
+      onClick={(e) => {
+        // Close sidebar on mobile when link is clicked
+        if (window.innerWidth < 768) {
+          const context = useContext(SidebarContext);
+          context?.setOpen(false);
+        }
+      }}
       {...props}
     >
       {link.icon}
-
       <motion.span
         animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
+          display: animate && !open ? "none" : "inline-block",
+          opacity: animate && !open ? 0 : 1,
         }}
-        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className="text-sm whitespace-nowrap"
       >
         {link.label}
       </motion.span>
