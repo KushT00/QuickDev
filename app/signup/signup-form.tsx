@@ -3,16 +3,19 @@
 'use client';
 
 import { useState } from "react";
-import { useRouter } from 'next/navigation'; // Correct hook for App Router
+import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Client, Account, ID } from "appwrite";
+import { createClient } from '@supabase/supabase-js';
 
-const client = new Client().setProject("6782434a002cdaea3420"); // Replace with your Project ID
-const account = new Account(client);
+// Create a single supabase client for interacting with your database
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
 export function SignupForm({
   className,
@@ -23,25 +26,67 @@ export function SignupForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
+      setIsLoading(false);
       return;
     }
 
     try {
-      const response = await account.create(ID.unique(), email, password, fullName);
-      console.log(response);
+      // Sign up with email and password
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      console.log("Signup successful:", data);
       setMessage("Signup successful! Redirecting...");
-      router.push("/"); // Navigate to home
+      
+      // If email confirmation is not required, redirect to home
+      // If email confirmation is required, show different message
+      if (data.user?.identities?.length === 0) {
+        setMessage("This email is already registered. Please log in instead.");
+      } else if (data.user && !data.session) {
+        setMessage("Please check your email to confirm your account before logging in.");
+      } else {
+        router.push("/"); // Navigate to home if auto sign-in is enabled
+      }
     } catch (error: any) {
-      console.error(error);
+      console.error("Signup failed:", error);
       setMessage(`Signup failed: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Google Signup Failed:", error);
+      setMessage("Something went wrong with Google signup. Please try again.");
     }
   };
 
@@ -61,9 +106,12 @@ export function SignupForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-xl font-bold">Create an account</h1>
                 <p className="text-muted-foreground text-sm">
-                  Sign up for your Acme Inc account
+                  Sign up for your QuickDev account
                 </p>
               </div>
+              {message && (
+                <p className="text-center text-sm text-red-500">{message}</p>
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -106,29 +154,39 @@ export function SignupForm({
                   required
                 />
               </div>
-              <Button type="submit" className="w-full bg-[#0C0555] text-white">
-                Sign Up
+              <Button 
+                type="submit" 
+                className="w-full bg-custom_purple text-white hover:bg-opacity-90" 
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing up..." : "Sign Up"}
               </Button>
-              {message && (
-                <p className="mt-4 text-center text-sm text-red-500">{message}</p>
-              )}
-              <div className="flex flex-col items-center gap-2 mt-4">
-                <p className="text-muted-foreground text-sm">Or sign up with</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                      <path
-                        d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                        fill="currentColor "
-                      />
-                    </svg>
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <svg aria-hidden="true" className="octicon octicon-mark-github" height="24" version="1.1" viewBox="0 0 16 16" width="24"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
-                    </svg>
-                  </Button>
-                </div>
+              
+              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                  Or sign up with
+                </span>
               </div>
+              
+              <Button 
+                type="button"
+                variant="outline" 
+                className="w-full"
+                onClick={handleGoogleSignup}
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  className="mr-2 h-4 w-4"
+                >
+                  <path
+                    d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Sign up with Google
+              </Button>
+              
               <p className="mt-4 text-center text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <a href="/login" className="text-blue-500 underline">
@@ -139,6 +197,10 @@ export function SignupForm({
           </form>
         </CardContent>
       </Card>
+      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
+        By signing up, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
+      </div>
     </div>
   );
 }

@@ -189,7 +189,7 @@ function BotConfiguration() {
 
 export default function SidebarDemo() {
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-    const { userName } = useUser(); // Destructure userName from the context
+    const { user } = useUser(); // Destructure userName from the context
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -269,11 +269,11 @@ export default function SidebarDemo() {
                     <div>
                         <SidebarLink
                             link={{
-                                label: userName || "Guest", // Dynamically set the username
+                                label: user.name || "Guest", // Dynamically set the username
                                 href: "#",
                                 icon: (
                                     <img
-                                        src="https://online.fliphtml5.com/umxbb/xesz/files/large/8e2963e4c1a7b9603cea6c7fcd95bada.jpg?1684900865"
+                                        src={user.avatarUrl || "https://github.com/shadcn.png"}
                                         className="h-7 w-7 flex-shrink-0 rounded-full"
                                         width={50}
                                         height={50}

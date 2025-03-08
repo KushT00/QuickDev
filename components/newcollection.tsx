@@ -4,22 +4,27 @@ import { Plus } from "lucide-react";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useState } from "react";
+
 interface NewCollectionDialogProps {
   onCreateCollection: (title: string, description: string) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
-export const NewCollectionDialog = ({ onCreateCollection }: NewCollectionDialogProps) => {
+
+export const NewCollectionDialog = ({ onCreateCollection, open, onOpenChange }: NewCollectionDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [open, setOpen] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreateCollection(title, description);
+    onCreateCollection(title, description || ""); // Allow empty description
     setTitle("");
     setDescription("");
-    setOpen(false);
+    onOpenChange(false);
   };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button
           size="lg"
@@ -48,21 +53,20 @@ export const NewCollectionDialog = ({ onCreateCollection }: NewCollectionDialogP
           </div>
           <div className="space-y-2">
             <label htmlFor="description" className="text-sm font-medium">
-              Description
+              Description (Optional)
             </label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter collection description"
-              required
             />
           </div>
           <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>

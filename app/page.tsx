@@ -10,9 +10,7 @@ import {
   MessageSquare, Mail, BarChart, Activity, Bell, Settings,
   UserCircle, ChevronRight, ArrowRight, CircleDotDashedIcon
 } from 'lucide-react';
-import { MacbookScrollDemo } from '@/components/ui/scrolldemo';
 import { useUser } from '@/context/userContext';
-import router from 'next/router';
 import { useRouter } from 'next/navigation';
 
 // Types
@@ -60,14 +58,16 @@ interface NavItem {
 // Component
 export default function Home() {
   const router = useRouter(); // Initialize router
-   const { userName } = useUser(); // Destructure userName from the context
-   const handleClick = () => {
-    if (!userName) {
-        router.replace('/login'); // Redirect to sign-in page if userName is empty
+  const { user } = useUser(); // Destructure userName from the context
+  
+  
+  const handleClick = () => {
+    if (!user) {
+      router.replace('/login'); // Redirect to sign-in page if userName is empty
     } else {
-        router.replace('/dashboard/getAgents'); // Redirect to dashboard if userName exists
+      router.replace('/dashboard/getAgents'); // Redirect to dashboard if userName exists
     }
-};
+  };
   // Navigation items
   const navItems: NavItem[] = [
     { label: 'Solutions', href: '#solutions' },
@@ -151,7 +151,7 @@ export default function Home() {
       experience: "8 years",
       rating: 4.9,
       projects: 142,
-      image: "/api/placeholder/300/300"
+      image: "https://github.com/shadcn.png"
     },
     {
       name: "Michael Rodriguez",
@@ -159,7 +159,7 @@ export default function Home() {
       experience: "6 years",
       rating: 4.8,
       projects: 98,
-      image: "/api/placeholder/300/300"
+      image: "https://github.com/shadcn.png"
     },
     {
       name: "Emily Watson",
@@ -167,7 +167,7 @@ export default function Home() {
       experience: "7 years",
       rating: 5.0,
       projects: 167,
-      image: "/api/placeholder/300/300"
+      image: "https://github.com/shadcn.png"
     }
   ];
 
@@ -176,19 +176,19 @@ export default function Home() {
     {
       name: "Alex Thompson",
       role: "CTO at TechFlow",
-      image: "/api/placeholder/300/300",
+      image: "https://github.com/shadcn.png",
       quote: "The AI agents have automated our customer support, reducing response time by 80% while maintaining high satisfaction rates."
     },
     {
       name: "Maria Garcia",
       role: "CEO at DataDrive",
-      image: "/api/placeholder/300/300",
+      image: "https://github.com/shadcn.png",
       quote: "Hiring developers through AIHub has been a game-changer. The quality of talent and the speed of deployment exceeded our expectations."
     },
     {
       name: "John Mitchell",
       role: "Founder at CloudScale",
-      image: "/api/placeholder/300/300",
+      image: "https://github.com/shadcn.png",
       quote: "We've seen a 200% increase in productivity since implementing AI agents alongside our development team."
     }
   ];
@@ -256,7 +256,10 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <Button onClick={handleClick}>  Started</Button>
+            <Button onClick={handleClick}>
+              {user ? "Dashboard" : "Get Started"}
+            </Button>
+
           </div>
         </div>
       </nav>

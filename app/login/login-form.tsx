@@ -8,13 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { Client, Account, OAuthProvider } from "appwrite";
+import { createClient } from '@supabase/supabase-js';
 
-const client = new Client()
-  .setEndpoint("https://cloud.appwrite.io/v1") // Your API Endpoint
-  .setProject("6782434a002cdaea3420"); // Your project ID
-
-const account = new Account(client);
+// Create a single supabase client for interacting with your database
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
 export function LoginForm({
   className,
@@ -28,8 +28,16 @@ export function LoginForm({
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await account.createEmailPasswordSession(email, password);
-      console.log("Login Successful:", response);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log("Login Successful:", data);
       setMessage("Login successful! Redirecting...");
       router.push("/"); // Redirect to the home page
     } catch (error) {
@@ -38,27 +46,18 @@ export function LoginForm({
     }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     try {
-      account.createOAuth2Session(
-        OAuthProvider.Google, // GitHub as the OAuth provider
-        "http://localhost:3000", // Redirect to localhost on success
-        "http://localhost:3000/failed" // Redirect to localhost on failure
-      );
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+  
+      if (error) throw error;
     } catch (error) {
-      console.error("GitHub Login Failed:", error);
-      setMessage("Something went wrong. Please try again.");
-    }
-  };
-  const handleGithubLogin = () => {
-    try {
-      account.createOAuth2Session(
-        OAuthProvider.Github, // provider
-        'https://localhost:3000', // redirect here on success
-        'https://localhost:3000/signup', // redirect here on failure
-    );
-    } catch (error) {
-      console.error("GitHub Login Failed:", error);
+      console.error("Google Login Failed:", error);
       setMessage("Something went wrong. Please try again.");
     }
   };
@@ -119,37 +118,19 @@ export function LoginForm({
                   Or continue with
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={handleGoogleLogin}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
                     <path
                       d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor "
+                      fill="currentColor"
                     />
                   </svg>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGithubLogin}
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="octicon octicon-mark-github"
-                    height="24"
-                    version="1.1"
-                    viewBox="0 0 16 16"
-                    width="24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-                    ></path>
-                  </svg>
+                  Sign in with Google
                 </Button>
               </div>
               <div className="text-center text-sm">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 import { useUser } from "@/context/userContext";
 import { cn } from "@/lib/utils";
