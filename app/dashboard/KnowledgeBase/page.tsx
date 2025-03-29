@@ -251,7 +251,7 @@ const KnowledgeBase = () => {
     }
   };
 
-  const handleFileUpload = async (file: File, type: "pdf" | "table" | "text" | "url") => {
+  const handleFileUpload = async (file: File, type: "pdf" | "table" | "text") => {
     if (!selectedCollection) {
       toast({
         title: "No collection selected",
@@ -260,11 +260,6 @@ const KnowledgeBase = () => {
       });
       return;
     }
-  
-    // Handle different types accordingly
-    console.log(`Uploading file: ${file.name} as type: ${type}`);
-  };
-  
 
     if (!user?.id) {
       toast({
