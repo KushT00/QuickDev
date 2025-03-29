@@ -12,7 +12,7 @@ interface SidebarProps {
 }
 
 export default function SidebarLayout({ children }: SidebarProps) {
-    const { userName } = useUser(); // Destructure userName from the context
+    const { user } = useUser(); // Destructure userName from the context
     const [open, setOpen] = useState(false);
 
     const links = [
@@ -38,7 +38,7 @@ export default function SidebarLayout({ children }: SidebarProps) {
                     <div className="mt-auto">
                         <SidebarLink
                             link={{
-                                label: userName || "Guest",
+                                label: user.name || "Guest",
                                 href: "#",
                                 icon: (
                                     <img
