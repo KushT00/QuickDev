@@ -10,10 +10,10 @@ interface Collection {
 }
 
 interface SidebarProps {
-  collections: Collection[]; // Add this line
+  collections: Collection[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  onNewClick: () => void;
+  onNewClick: (refreshCollections: () => void) => void; // Accept a refresh function
 }
 
 export const KBSidebar = ({ selectedId, onSelect, onNewClick }: SidebarProps) => {
