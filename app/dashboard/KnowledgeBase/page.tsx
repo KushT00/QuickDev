@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { KBSidebar } from "@/components/kb-sidebar";
 
 
+
 export default function SidebarDemo() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { user } = useUser(); // Destructure userName from the context
@@ -250,7 +251,7 @@ const KnowledgeBase = () => {
     }
   };
 
-  const handleFileUpload = async (file: File, type: "pdf" | "table" | "text") => {
+  const handleFileUpload = async (file: File, type: "pdf" | "table" | "text" | "url") => {
     if (!selectedCollection) {
       toast({
         title: "No collection selected",
@@ -259,6 +260,11 @@ const KnowledgeBase = () => {
       });
       return;
     }
+  
+    // Handle different types accordingly
+    console.log(`Uploading file: ${file.name} as type: ${type}`);
+  };
+  
 
     if (!user?.id) {
       toast({

@@ -5,9 +5,10 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 interface UploadSectionProps {
-  onUpload: (file: File, type: string) => void;
+  onUpload: (file: File, type: "pdf" | "table" | "text") => void;
   onUrlAdd: (url: string) => void;
 }
+
 export const UploadSection = ({ onUpload, onUrlAdd }: UploadSectionProps) => {
   const [url, setUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
