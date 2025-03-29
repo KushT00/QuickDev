@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "next/link";
@@ -103,7 +104,7 @@ export const DesktopSidebar = ({
           <div className="absolute top-0 left-1/4 w-[300px] h-[200px] bg-purple-500/20 blur-3xl rounded-full" />
           <div className="absolute bottom-1/4 -left-1/4 w-[250px] h-[250px] bg-blue-400/20 blur-2xl rounded-full" />
         </div>
-        {children}
+        {children as React.ReactNode}
       </motion.div>
     </>
   );
