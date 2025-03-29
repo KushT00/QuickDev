@@ -4,10 +4,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Supabase client setup
-const supabaseUrl = "https://immnnggjwqeidcamkgty.supabase.co";
-const supabaseAnonKey = "YOUR_SUPABASE_ANON_KEY"; // Replace with your actual anon key
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  throw new Error("Missing Supabase environment variables");
+}
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
 
 type UserMetadata = {
   avatar_url?: string;
@@ -41,7 +46,14 @@ type UserProviderProps = {
 };
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<{
+    id: string | null;
+    email: string | null;
+    name: string | null;
+    avatarUrl: string | null;
+    isAuthenticated: boolean;
+    provider: string | null;
+  }>({
     id: null,
     email: null,
     name: null,
@@ -49,6 +61,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     isAuthenticated: false,
     provider: null,
   });
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,13 +80,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         const metadata = userData.user_metadata as UserMetadata;
         
         setUser({
-          id: userData.id,
-          email: userData.email,
+          id: userData.id ?? null,
+          email: userData.email ?? null,  // Ensure email is either a string or null
           name: metadata.name || metadata.full_name || "User",
           avatarUrl: metadata.avatar_url || metadata.picture || null,
           isAuthenticated: true,
           provider: userData.app_metadata?.provider || null
         });
+        
       } else {
         setUser({
           id: null,
@@ -103,13 +117,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           const metadata = userData.user_metadata as UserMetadata;
           
           setUser({
-            id: userData.id,
-            email: userData.email,
+            id: userData.id ?? null,
+            email: userData.email ?? null,  // Ensure email is either a string or null
             name: metadata.name || metadata.full_name || "User",
             avatarUrl: metadata.avatar_url || metadata.picture || null,
             isAuthenticated: true,
             provider: userData.app_metadata?.provider || null
           });
+          
         } else {
           setUser({
             id: null,
